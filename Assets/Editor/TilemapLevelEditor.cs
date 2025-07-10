@@ -30,8 +30,7 @@ public class TilemapLevelEditor : EditorWindow
     private EditMode currentMode = EditMode.Tile;
 
     private Vector2Int? hoveredCell = null;
-
-    private int currentRotation = 0; // rotation in degrees (0/90/180/270)
+    private int currentRotation = 0;
 
     [MenuItem("Tools/Tilemap Level Editor")]
     public static void ShowWindow() => GetWindow<TilemapLevelEditor>("Tilemap Level Editor");
@@ -45,7 +44,6 @@ public class TilemapLevelEditor : EditorWindow
         gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
         gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
 
-        // Current level input with Prev/Next buttons
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("◀ Prev", GUILayout.Width(60))) { currentLevel = Mathf.Max(1, currentLevel - 1); LoadLevel(); }
         currentLevel = EditorGUILayout.IntField("Level", currentLevel);
@@ -95,7 +93,6 @@ public class TilemapLevelEditor : EditorWindow
         if (GUILayout.Button("All")) { placedTiles.Clear(); placedPrefabs.Clear(); enemySpawnCells.Clear(); patrolCells.Clear(); }
         EditorGUILayout.EndHorizontal();
 
-        // Adaptive scroll view
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandHeight(true));
         DrawGrid();
         EditorGUILayout.EndScrollView();

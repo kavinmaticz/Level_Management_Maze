@@ -26,6 +26,7 @@ public class LevelManager : MonoBehaviour
     {
         LoadLevelData();
         BuildEmptyGridCells();
+        SpawnTiles();
         SpawnPrefabs();
         SpawnEnemies();
     }
@@ -33,7 +34,7 @@ public class LevelManager : MonoBehaviour
     void LoadLevelData()
     {
         string path = Application.dataPath + $"/Level{levelToLoad}.json";
-        if (!File.Exists(path)) { Debug.LogWarning("Level not found"); return; }
+        if (!File.Exists(path)) { Debug.LogWarning("Level not found at: " + path); return; }
 
         var data = JsonUtility.FromJson<LevelTileData>(File.ReadAllText(path));
         gridWidth = data.width;
@@ -43,16 +44,22 @@ public class LevelManager : MonoBehaviour
         enemySpawnPoints = data.enemySpawns ?? new List<Vector2Int>();
         patrolPoints = data.patrolPoints ?? new List<Vector2Int>();
 
+        Debug.Log($"Loaded level {levelToLoad}: tiles={loadedTiles.Count}, prefabs={loadedPrefabs.Count}, spawns={enemySpawnPoints.Count}");
+    }
+
+    void SpawnTiles()
+    {
         foreach (var tile in loadedTiles)
         {
-            var bind = tilemapBindings.FirstOrDefault(b => b.type == tile.tilemapType);
-            if (bind != null && bind.tilemap != null && tile.tileIndex >= 0 && tile.tileIndex < assetsDatabase.tiles.Length)
+            var binding = tilemapBindings.FirstOrDefault(b => b.type == tile.tilemapType);
+            if (binding != null && binding.tilemap != null && tile.tileIndex >= 0 && tile.tileIndex < assetsDatabase.tiles.Length)
             {
-                bind.tilemap.SetTile(new Vector3Int(tile.position.x, tile.position.y, 0), assetsDatabase.tiles[tile.tileIndex]);
+                var cellPos = new Vector3Int(tile.position.x, tile.position.y, 0);
+                binding.tilemap.SetTile(cellPos, assetsDatabase.tiles[tile.tileIndex]);
 
-                // Apply rotation (works with Unity's tile transform)
-                var tileTransform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, tile.rotation));
-                bind.tilemap.SetTransformMatrix(new Vector3Int(tile.position.x, tile.position.y, 0), tileTransform);
+                // Apply rotation
+                var tileTransform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, -tile.rotation));
+                binding.tilemap.SetTransformMatrix(cellPos, tileTransform);
             }
             else
             {
@@ -63,6 +70,20 @@ public class LevelManager : MonoBehaviour
 
     void SpawnPrefabs()
     {
+        if (assetsDatabase.prefabs == null || tilemapBindings == null || tilemapBindings.Length == 0)
+        {
+            Debug.LogWarning("Missing prefabs or tilemap bindings!");
+            return;
+        }
+
+        // Find any tilemap (e.g., Ground) to get grid position
+        var groundTilemap = tilemapBindings.FirstOrDefault(b => b.type == TilemapType.Ground)?.tilemap;
+        if (groundTilemap == null)
+        {
+            Debug.LogWarning("No Ground tilemap to align prefab positions!");
+            return;
+        }
+
         foreach (var p in loadedPrefabs)
         {
             if (p.prefabIndex >= 0 && p.prefabIndex < assetsDatabase.prefabs.Length)
@@ -70,40 +91,33 @@ public class LevelManager : MonoBehaviour
                 var prefab = assetsDatabase.prefabs[p.prefabIndex];
                 if (prefab != null)
                 {
-                    Vector3 pos;
-                    if (p.size.x == 1 && p.size.y == 1)
-                    {
-                        // For single cell prefab: center of the cell
-                        pos = new Vector3(p.position.x + 0.5f, p.position.y + 0.5f, 0);
-                    }
-                    else
-                    {
-                        // For multi-cell prefab: center of its area
-                        pos = new Vector3(p.position.x + p.size.x / 2f, p.position.y + p.size.y / 2f, 0);
-                    }
-                    p.instance = Instantiate(prefab, pos, Quaternion.identity);
+                    Vector3Int cellPos = new Vector3Int(p.position.x, p.position.y, 0);
+                    Vector3 worldPos = groundTilemap.CellToWorld(cellPos);
+
+                    // Align to tile center if needed
+                    worldPos += groundTilemap.cellSize / 2;
+
+                    var instance = Instantiate(prefab, worldPos, Quaternion.identity);
+                    Debug.Log($"Spawned prefab '{prefab.name}' at grid cell {p.position} -> world pos {worldPos}");
                 }
             }
         }
     }
 
+
     void SpawnEnemies()
     {
-        if (assetsDatabase.enemyPrefab == null) { Debug.LogWarning("No enemy prefab"); return; }
+        if (assetsDatabase.enemyPrefab == null)
+        {
+            Debug.LogWarning("No enemy prefab in assetsDatabase");
+            return;
+        }
 
         foreach (var pos in enemySpawnPoints)
         {
-            Vector3 spawnPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0);
-            var enemy = Instantiate(assetsDatabase.enemyPrefab, spawnPos, Quaternion.identity);
-
-            // Optional: assign patrol points if you have AI
-            /*
-            var ai = enemy.GetComponent<EnemyAI>();
-            if (ai != null && patrolPoints != null)
-            {
-                ai.patrolPoints = patrolPoints.Select(p => new Vector3(p.x + 0.5f, p.y + 0.5f, 0)).ToList();
-            }
-            */
+            Vector3 spawnPos = new Vector3(pos.x, pos.y, 0);
+            Instantiate(assetsDatabase.enemyPrefab, spawnPos, Quaternion.identity);
+            Debug.Log($"Spawned enemy at {spawnPos}");
         }
     }
 
@@ -148,7 +162,7 @@ public class PlacedTile
     public Vector2Int position;
     public int tileIndex;
     public TilemapType tilemapType;
-    public int rotation; // keep rotation info
+    public int rotation;
 }
 
 [Serializable]
@@ -156,8 +170,7 @@ public class PlacedPrefab
 {
     public Vector2Int position;
     public int prefabIndex;
-    public Vector2Int size; // usually Vector2Int.one
-    [NonSerialized] public GameObject instance;
+    public Vector2Int size;
 }
 
 [Serializable]

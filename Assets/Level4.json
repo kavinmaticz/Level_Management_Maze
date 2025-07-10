@@ -1324,6 +1324,33 @@
             "tileIndex": 19,
             "tilemapType": 1,
             "rotation": 0
+        },
+        {
+            "position": {
+                "x": 4,
+                "y": 23
+            },
+            "tileIndex": 19,
+            "tilemapType": 1,
+            "rotation": 180
+        },
+        {
+            "position": {
+                "x": 4,
+                "y": 22
+            },
+            "tileIndex": 19,
+            "tilemapType": 1,
+            "rotation": 180
+        },
+        {
+            "position": {
+                "x": 4,
+                "y": 21
+            },
+            "tileIndex": 16,
+            "tilemapType": 1,
+            "rotation": 0
         }
     ],
     "prefabs": [

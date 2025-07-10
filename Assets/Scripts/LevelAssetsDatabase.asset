@@ -34,7 +34,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6af2a75548330ea40900d3c899ad7a9b, type: 2}
   - {fileID: 11400000, guid: cb711f9f8b0e37e4ba1d1c1bbadc7dc7, type: 2}
   prefabs:
-  - {fileID: 2656575477739039263, guid: 5d0697855825dfc42ad9c9823f5727e5, type: 3}
+  - {fileID: 3960007401523892241, guid: 932d1ac2dc4559449a7144d061c55392, type: 3}
   enemyPrefab: {fileID: 2656575477739039263, guid: 5d0697855825dfc42ad9c9823f5727e5, type: 3}
   tilemapTypes:
   - type: 0
