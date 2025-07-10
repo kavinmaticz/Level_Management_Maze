@@ -1,0 +1,209 @@
+{
+    "width": 50,
+    "height": 25,
+    "tiles": [
+        {
+            "position": {
+                "x": 0,
+                "y": 23
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 24
+            },
+            "tileIndex": 6,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 22
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 21
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 20
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 19
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 18
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 17
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 16
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 15
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 14
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 13
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 12
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 11
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 10
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 9
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 8
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 7
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 6
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 5
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 4
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 3
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 2
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 1
+            },
+            "tileIndex": 19,
+            "tilemapType": 2
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "tileIndex": 5,
+            "tilemapType": 2
+        }
+    ],
+    "prefabs": [],
+    "enemySpawns": [],
+    "patrolPoints": []
+}

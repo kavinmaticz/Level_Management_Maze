@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8277b1c5a8afbff4eb07eede15bc2dfa, type: 3}
+  m_Name: LevelAssetsDatabase
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: 89539384d3597d247adf2fad1d3f51c1, type: 2}
+  - {fileID: 11400000, guid: 270278d05be35b54680858db26425510, type: 2}
+  - {fileID: 11400000, guid: 221860e5bf0bd1f41a07af156aec3931, type: 2}
+  - {fileID: 11400000, guid: a16af01d3d69b22419f926c4ef9a3efa, type: 2}
+  - {fileID: 11400000, guid: f1ea5416911d9b8469512eb1fe96f5ba, type: 2}
+  - {fileID: 11400000, guid: d6551caa08b22e749b228acc1af7a218, type: 2}
+  - {fileID: 11400000, guid: cb2993164077e214fa17150455ccf825, type: 2}
+  - {fileID: 11400000, guid: 72631411271dc9b4d95e6911ff6e040c, type: 2}
+  - {fileID: 11400000, guid: d0b9beb143956a845af7751e5cd2166c, type: 2}
+  - {fileID: 11400000, guid: 48c6d3368a1248640aa76efb5adf704b, type: 2}
+  - {fileID: 11400000, guid: e21ab1e110fc11d47aa2c8e327ad6eef, type: 2}
+  - {fileID: 11400000, guid: f8c75d4c26a6abc44b0a8ca8a0301871, type: 2}
+  - {fileID: 11400000, guid: 8dbefdd5c72c620498d2a95c11b5f7e0, type: 2}
+  - {fileID: 11400000, guid: b9935ba3fa4627446893aaf3b48f79f0, type: 2}
+  - {fileID: 11400000, guid: d29ba18fbc8f6914184345ab9b13edcc, type: 2}
+  - {fileID: 11400000, guid: efad636cc4483e94f88badf1b34c240c, type: 2}
+  - {fileID: 11400000, guid: 49d9388042b59b341b79ac82cb9f274b, type: 2}
+  - {fileID: 11400000, guid: 40c626987b7c6ba43bf2987c09a5de9e, type: 2}
+  - {fileID: 11400000, guid: 6af2a75548330ea40900d3c899ad7a9b, type: 2}
+  - {fileID: 11400000, guid: cb711f9f8b0e37e4ba1d1c1bbadc7dc7, type: 2}
+  prefabs:
+  - {fileID: 2656575477739039263, guid: 5d0697855825dfc42ad9c9823f5727e5, type: 3}
+  enemyPrefab: {fileID: 2656575477739039263, guid: 5d0697855825dfc42ad9c9823f5727e5, type: 3}
+  tilemapTypes:
+  - type: 0
+    displayName: Walls
+  - type: 1
+    displayName: Ground
+  - type: 2
+    displayName: Obstacles
