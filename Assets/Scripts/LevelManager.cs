@@ -48,11 +48,11 @@ public class LevelManager : MonoBehaviour
             var bind = tilemapBindings.FirstOrDefault(b => b.type == tile.tilemapType);
             if (bind != null && bind.tilemap != null && tile.tileIndex >= 0 && tile.tileIndex < assetsDatabase.tiles.Length)
             {
-                Vector3Int pos = new Vector3Int(tile.position.x, tile.position.y, 0);
-                bind.tilemap.SetTile(pos, assetsDatabase.tiles[tile.tileIndex]);
+                bind.tilemap.SetTile(new Vector3Int(tile.position.x, tile.position.y, 0), assetsDatabase.tiles[tile.tileIndex]);
 
-                // ✅ Apply saved rotation
-                bind.tilemap.SetTransformMatrix(pos, Matrix4x4.Rotate(Quaternion.Euler(0, 0, -tile.rotation)));
+                // Apply rotation (works with Unity's tile transform)
+                var tileTransform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, tile.rotation));
+                bind.tilemap.SetTransformMatrix(new Vector3Int(tile.position.x, tile.position.y, 0), tileTransform);
             }
             else
             {
@@ -70,7 +70,17 @@ public class LevelManager : MonoBehaviour
                 var prefab = assetsDatabase.prefabs[p.prefabIndex];
                 if (prefab != null)
                 {
-                    Vector3 pos = new Vector3(p.position.x + p.size.x / 2f, p.position.y + p.size.y / 2f, 0);
+                    Vector3 pos;
+                    if (p.size.x == 1 && p.size.y == 1)
+                    {
+                        // For single cell prefab: center of the cell
+                        pos = new Vector3(p.position.x + 0.5f, p.position.y + 0.5f, 0);
+                    }
+                    else
+                    {
+                        // For multi-cell prefab: center of its area
+                        pos = new Vector3(p.position.x + p.size.x / 2f, p.position.y + p.size.y / 2f, 0);
+                    }
                     p.instance = Instantiate(prefab, pos, Quaternion.identity);
                 }
             }
@@ -83,10 +93,10 @@ public class LevelManager : MonoBehaviour
 
         foreach (var pos in enemySpawnPoints)
         {
-            Vector3 spawnPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0); // center
+            Vector3 spawnPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0);
             var enemy = Instantiate(assetsDatabase.enemyPrefab, spawnPos, Quaternion.identity);
 
-            // Example: assign patrol points if needed
+            // Optional: assign patrol points if you have AI
             /*
             var ai = enemy.GetComponent<EnemyAI>();
             if (ai != null && patrolPoints != null)
@@ -138,7 +148,7 @@ public class PlacedTile
     public Vector2Int position;
     public int tileIndex;
     public TilemapType tilemapType;
-    public int rotation; // ✅ include rotation
+    public int rotation; // keep rotation info
 }
 
 [Serializable]
@@ -146,7 +156,7 @@ public class PlacedPrefab
 {
     public Vector2Int position;
     public int prefabIndex;
-    public Vector2Int size;
+    public Vector2Int size; // usually Vector2Int.one
     [NonSerialized] public GameObject instance;
 }
 
