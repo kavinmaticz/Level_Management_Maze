@@ -44,7 +44,14 @@ public class TilemapLevelEditor : EditorWindow
 
         gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
         gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
-        currentLevel = EditorGUILayout.IntField("Current Level", currentLevel);
+
+        // Current level input with Prev/Next buttons
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("◀ Prev", GUILayout.Width(60))) { currentLevel = Mathf.Max(1, currentLevel - 1); LoadLevel(); }
+        currentLevel = EditorGUILayout.IntField("Level", currentLevel);
+        if (GUILayout.Button("Next ▶", GUILayout.Width(60))) { currentLevel++; LoadLevel(); }
+        EditorGUILayout.EndHorizontal();
+
         gridZoom = EditorGUILayout.Slider("Grid Zoom %", gridZoom, 25f, 300f);
 
         if (assetsDatabase.tilemapTypes != null && assetsDatabase.tilemapTypes.Length > 0)
