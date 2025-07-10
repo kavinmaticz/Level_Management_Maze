@@ -48,7 +48,11 @@ public class LevelManager : MonoBehaviour
             var bind = tilemapBindings.FirstOrDefault(b => b.type == tile.tilemapType);
             if (bind != null && bind.tilemap != null && tile.tileIndex >= 0 && tile.tileIndex < assetsDatabase.tiles.Length)
             {
-                bind.tilemap.SetTile(new Vector3Int(tile.position.x, tile.position.y, 0), assetsDatabase.tiles[tile.tileIndex]);
+                Vector3Int pos = new Vector3Int(tile.position.x, tile.position.y, 0);
+                bind.tilemap.SetTile(pos, assetsDatabase.tiles[tile.tileIndex]);
+
+                // ✅ Apply saved rotation
+                bind.tilemap.SetTransformMatrix(pos, Matrix4x4.Rotate(Quaternion.Euler(0, 0, -tile.rotation)));
             }
             else
             {
@@ -82,12 +86,14 @@ public class LevelManager : MonoBehaviour
             Vector3 spawnPos = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0); // center
             var enemy = Instantiate(assetsDatabase.enemyPrefab, spawnPos, Quaternion.identity);
 
-            // If your enemy has AI script, assign patrol points
-           /* var ai = enemy.GetComponent<EnemyAI>();
+            // Example: assign patrol points if needed
+            /*
+            var ai = enemy.GetComponent<EnemyAI>();
             if (ai != null && patrolPoints != null)
             {
                 ai.patrolPoints = patrolPoints.Select(p => new Vector3(p.x + 0.5f, p.y + 0.5f, 0)).ToList();
-            }*/
+            }
+            */
         }
     }
 
@@ -102,8 +108,6 @@ public class LevelManager : MonoBehaviour
             for (int dx = 0; dx < p.size.x; dx++)
                 for (int dy = 0; dy < p.size.y; dy++)
                     occupied.Add(new Vector2Int(p.position.x + dx, p.position.y + dy));
-
-        // enemySpawnPoints and patrolPoints do NOT mark as occupied
 
         emptyCells.Clear();
         for (int x = 0; x < gridWidth; x++)
@@ -134,6 +138,7 @@ public class PlacedTile
     public Vector2Int position;
     public int tileIndex;
     public TilemapType tilemapType;
+    public int rotation; // ✅ include rotation
 }
 
 [Serializable]
@@ -152,5 +157,5 @@ public class LevelTileData
     public List<PlacedTile> tiles;
     public List<PlacedPrefab> prefabs;
     public List<Vector2Int> enemySpawns;
-    public List<Vector2Int> patrolPoints; // new
+    public List<Vector2Int> patrolPoints;
 }
