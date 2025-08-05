@@ -21,6 +21,7 @@ public class LevelManager : MonoBehaviour
 
     public List<Vector2Int> emptyCells = new List<Vector2Int>();
     private int gridWidth, gridHeight;
+    public List<GameObject> patrolObjects = new List<GameObject>();
 
     void Start()
     {
@@ -29,7 +30,33 @@ public class LevelManager : MonoBehaviour
         SpawnTiles();
         SpawnPrefabs();
         SpawnEnemies();
+        SpawnPatrolPoints();
     }
+
+    void SpawnPatrolPoints()
+    {
+        patrolObjects.Clear(); // Clear previous ones if reloading
+
+        var groundTilemap = tilemapBindings.FirstOrDefault(b => b.type == TilemapType.Ground)?.tilemap;
+        if (groundTilemap == null)
+        {
+            Debug.LogWarning("No Ground tilemap found to convert patrol cell to world position.");
+            return;
+        }
+
+        foreach (var pos in patrolPoints)
+        {
+            Vector3Int cellPos = new Vector3Int(pos.x, pos.y, 0);
+            Vector3 worldPos = groundTilemap.CellToWorld(cellPos) + groundTilemap.cellSize / 2;
+
+            GameObject go = new GameObject($"PatrolPoint_{pos.x}_{pos.y}");
+            go.transform.position = worldPos;
+            patrolObjects.Add(go);
+        }
+
+        Debug.Log($"Spawned {patrolObjects.Count} patrol point objects.");
+    }
+
 
     void LoadLevelData()
     {
