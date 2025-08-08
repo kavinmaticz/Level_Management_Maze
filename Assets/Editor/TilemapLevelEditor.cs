@@ -18,7 +18,6 @@ public class TilemapLevelEditor : EditorWindow
 
     private List<PlacedTile> placedTiles = new List<PlacedTile>();
     private List<PlacedPrefab> placedPrefabs = new List<PlacedPrefab>();
-    private List<Vector2Int> enemySpawnCells = new List<Vector2Int>();
     private List<Vector2Int> patrolCells = new List<Vector2Int>();
 
     private Vector2 scrollPos;
@@ -26,18 +25,23 @@ public class TilemapLevelEditor : EditorWindow
     private float gridZoom = 100f;
     private bool eraseMode = false;
 
-    private enum EditMode { None, Tile, Prefab, SpawnPoint, PatrolPoint }
+    private enum EditMode { None, Tile, Prefab, PatrolPoint, PlayerSpawn }
     private EditMode currentMode = EditMode.Tile;
 
     private Vector2Int? hoveredCell = null;
     private int currentRotation = 0;
+    private bool flipX = false;
+    private bool flipY = false;
+
+    private int selectedBackgroundIndex = -1;
+    private Vector2Int? playerSpawnCell = null;
 
     [MenuItem("Tools/Tilemap Level Editor")]
     public static void ShowWindow() => GetWindow<TilemapLevelEditor>("Tilemap Level Editor");
 
     private void OnGUI()
     {
-        GUILayout.Label("🧩 Tilemap Level Editor", EditorStyles.boldLabel);
+        GUILayout.Label("\ud83e\udde9 Tilemap Level Editor", EditorStyles.boldLabel);
         assetsDatabase = (LevelAssetsDatabase)EditorGUILayout.ObjectField("Assets DB", assetsDatabase, typeof(LevelAssetsDatabase), false);
         if (assetsDatabase == null) return;
 
@@ -45,13 +49,24 @@ public class TilemapLevelEditor : EditorWindow
         gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
 
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("◀ Prev", GUILayout.Width(60))) { currentLevel = Mathf.Max(1, currentLevel - 1); LoadLevel(); }
+        if (GUILayout.Button("\u25c0 Prev", GUILayout.Width(60))) { currentLevel = Mathf.Max(1, currentLevel - 1); LoadLevel(); }
         currentLevel = EditorGUILayout.IntField("Level", currentLevel);
-        if (GUILayout.Button("Next ▶", GUILayout.Width(60))) { currentLevel++; LoadLevel(); }
+        if (GUILayout.Button("Next \u25b6", GUILayout.Width(60))) { currentLevel++; LoadLevel(); }
         EditorGUILayout.EndHorizontal();
 
         gridZoom = EditorGUILayout.Slider("Grid Zoom %", gridZoom, 25f, 300f);
 
+
+        GUILayout.Space(5);
+        GUILayout.Label("\u270f\ufe0f Mode Selection", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+        DrawModeButton(EditMode.Tile, "Tile Mode");
+        DrawModeButton(EditMode.Prefab, "Prefab Mode");
+        DrawModeButton(EditMode.PatrolPoint, "Patrol Point");
+        DrawModeButton(EditMode.PlayerSpawn, "Player Spawn");
+        EditorGUILayout.EndHorizontal();
+
+        GUILayout.Space(20);
         if (assetsDatabase.tilemapTypes != null && assetsDatabase.tilemapTypes.Length > 0)
         {
             string[] names = assetsDatabase.tilemapTypes.Select(t => t.displayName).ToArray();
@@ -62,20 +77,17 @@ public class TilemapLevelEditor : EditorWindow
 
         if (assetsDatabase.tiles != null && assetsDatabase.tiles.Length > 0)
         {
-            GUILayout.Label($"Tiles (Rotation: {currentRotation}°)", EditorStyles.boldLabel);
+            GUILayout.Label($"Tiles (Rotation: {currentRotation}\u00b0)", EditorStyles.boldLabel);
+            GUILayout.BeginHorizontal();
+            flipX = GUILayout.Toggle(flipX, "Flip X");
+            flipY = GUILayout.Toggle(flipY, "Flip Y");
+            GUILayout.EndHorizontal();
             DrawAssetPalette(assetsDatabase.tiles, ref selectedTileIndex, 48f);
         }
 
-        GUILayout.Space(5);
-        GUILayout.Label("✏️ Mode Selection", EditorStyles.boldLabel);
-        EditorGUILayout.BeginHorizontal();
-        DrawModeButton(EditMode.Tile, "Tile Mode");
-        DrawModeButton(EditMode.Prefab, "Prefab Mode");
-        DrawModeButton(EditMode.SpawnPoint, "Spawn Point");
-        DrawModeButton(EditMode.PatrolPoint, "Patrol Point");
-        EditorGUILayout.EndHorizontal();
 
-        eraseMode = GUILayout.Toggle(eraseMode, "Erase Mode");
+
+
 
         if (assetsDatabase.prefabs != null && assetsDatabase.prefabs.Length > 0)
         {
@@ -83,14 +95,24 @@ public class TilemapLevelEditor : EditorWindow
             DrawAssetPalette(assetsDatabase.prefabs, ref selectedPrefabIndex, 48f);
         }
 
+        if (assetsDatabase.backgroundSprites != null && assetsDatabase.backgroundSprites.Length > 0)
+        {
+            GUILayout.Label("Background Sprites", EditorStyles.boldLabel);
+            DrawSpritePalette(assetsDatabase.backgroundSprites, 48f);
+        }
+
+        GUILayout.Space(20);
+
+        eraseMode = GUILayout.Toggle(eraseMode, "Erase Mode");
+
         GUILayout.Space(5);
-        GUILayout.Label("🧹 Clear Options", EditorStyles.boldLabel);
+        GUILayout.Label("\ud83e\uddf9 Clear Options", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Tiles")) placedTiles.Clear();
         if (GUILayout.Button("Prefabs")) placedPrefabs.Clear();
-        if (GUILayout.Button("Spawns")) enemySpawnCells.Clear();
         if (GUILayout.Button("Patrols")) patrolCells.Clear();
-        if (GUILayout.Button("All")) { placedTiles.Clear(); placedPrefabs.Clear(); enemySpawnCells.Clear(); patrolCells.Clear(); }
+        if (GUILayout.Button("Player")) playerSpawnCell = null;
+        if (GUILayout.Button("All")) { placedTiles.Clear(); placedPrefabs.Clear(); patrolCells.Clear(); }
         EditorGUILayout.EndHorizontal();
 
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandHeight(true));
@@ -100,7 +122,7 @@ public class TilemapLevelEditor : EditorWindow
         GUILayout.FlexibleSpace();
 
         GUILayout.Space(10);
-        GUILayout.Label("💾 Save / Load", EditorStyles.boldLabel);
+        GUILayout.Label("\ud83d\udcbe Save / Load", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Save")) SaveLevel();
         if (GUILayout.Button("Load")) LoadLevel();
@@ -116,6 +138,30 @@ public class TilemapLevelEditor : EditorWindow
         if (GUILayout.Button(label))
             currentMode = active ? EditMode.None : mode;
         GUI.backgroundColor = Color.white;
+    }
+
+    private void DrawSpritePalette(Sprite[] sprites, float size)
+    {
+        int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 40) / (size + 6)));
+
+        for (int i = 0; i < sprites.Length; i += perRow)
+        {
+            EditorGUILayout.BeginHorizontal();
+            for (int j = 0; j < perRow && i + j < sprites.Length; j++)
+            {
+                int idx = i + j;
+                var sprite = sprites[idx];
+                Texture2D tex = sprite != null ? AssetPreview.GetAssetPreview(sprite) : Texture2D.grayTexture;
+
+                GUI.backgroundColor = (selectedBackgroundIndex == idx) ? Color.green : Color.white;
+
+                if (GUILayout.Button(tex, GUILayout.Width(size), GUILayout.Height(size)))
+                    selectedBackgroundIndex = idx;
+
+                GUI.backgroundColor = Color.white;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
     }
 
     private void DrawAssetPalette(Object[] assets, ref int selectedIndex, float size)
@@ -137,8 +183,23 @@ public class TilemapLevelEditor : EditorWindow
                 if (preview == null) preview = Texture2D.grayTexture;
 
                 GUI.backgroundColor = (selectedIndex == idx) ? Color.cyan : Color.white;
+
+                GUILayout.BeginVertical(GUILayout.Width(size + 4));
                 if (GUILayout.Button(preview, GUILayout.Width(size), GUILayout.Height(size)))
                     selectedIndex = idx;
+
+                if (asset is GameObject)
+                {
+                    GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
+                    labelStyle.fontSize = 9;
+                    labelStyle.alignment = TextAnchor.MiddleCenter;
+                    labelStyle.wordWrap = true;
+
+                    GUILayout.Label(asset.name, labelStyle, GUILayout.Width(size));
+                }
+
+                GUILayout.EndVertical();
+
                 GUI.backgroundColor = Color.white;
             }
             EditorGUILayout.EndHorizontal();
@@ -161,12 +222,12 @@ public class TilemapLevelEditor : EditorWindow
                 if (rect.Contains(Event.current.mousePosition))
                     hoveredCell = cell;
 
-                bool isSpawn = enemySpawnCells.Contains(cell);
                 bool isPatrol = patrolCells.Contains(cell);
+                bool isPlayer = playerSpawnCell.HasValue && playerSpawnCell.Value == cell; // ✅
 
-                GUI.color = isPatrol ? new Color(0, 0.5f, 0.8f, 0.8f) :
-                          isSpawn ? new Color(0.7f, 0, 0, 0.8f) :
-                          eraseMode ? new Color(1, 0.5f, 0.5f) : Color.white;
+                GUI.color = isPlayer ? new Color(1f, 1f, 0f, 0.8f) : // ✅ Yellow highlight
+                            isPatrol ? new Color(0, 0.5f, 0.8f, 0.8f) :
+                            eraseMode ? new Color(1, 0.5f, 0.5f) : Color.white;
 
                 if (GUI.Button(rect, GUIContent.none)) ToggleCellAt(x, y);
                 GUI.color = Color.white;
@@ -187,7 +248,7 @@ public class TilemapLevelEditor : EditorWindow
                         var t = assetsDatabase.tiles[tile.tileIndex];
                         Texture2D tex = (t is Tile cast && cast.sprite != null) ? cast.sprite.texture : AssetPreview.GetMiniThumbnail(t);
                         if (tex != null)
-                            DrawTextureRotated(rect, tex, tile.rotation);
+                            DrawTextureRotated(rect, tex, tile.rotation, tile.flipX, tile.flipY);
                     }
                 }
 
@@ -212,7 +273,7 @@ public class TilemapLevelEditor : EditorWindow
                     if (hover)
                     {
                         GUI.color = new Color(1, 1, 1, 0.5f);
-                        DrawTextureRotated(rect, hover, angle);
+                        DrawTextureRotated(rect, hover, angle, flipX, flipY);
                         GUI.color = Color.white;
                     }
                 }
@@ -224,13 +285,17 @@ public class TilemapLevelEditor : EditorWindow
         }
     }
 
-    private void DrawTextureRotated(Rect rect, Texture2D tex, int angle)
+    private void DrawTextureRotated(Rect rect, Texture2D tex, int angle, bool flipX, bool flipY)
     {
-        Matrix4x4 prev = GUI.matrix;
+        Matrix4x4 prevMatrix = GUI.matrix;
+
         Vector2 pivot = rect.center;
+
+        Vector2 scale = new Vector2(flipX ? -1f : 1f, flipY ? -1f : 1f);
+        GUIUtility.ScaleAroundPivot(scale, pivot);
         GUIUtility.RotateAroundPivot(angle, pivot);
         GUI.DrawTexture(rect, tex, ScaleMode.ScaleToFit);
-        GUI.matrix = prev;
+        GUI.matrix = prevMatrix;
     }
 
     private void ToggleCellAt(int x, int y)
@@ -244,15 +309,24 @@ public class TilemapLevelEditor : EditorWindow
         else if (currentMode == EditMode.Tile)
         {
             if (eraseMode) placedTiles.RemoveAll(t => t.position == c && t.tilemapType == selectedTilemapType);
-            else placedTiles.Add(new PlacedTile { position = c, tileIndex = selectedTileIndex, tilemapType = selectedTilemapType, rotation = currentRotation });
-        }
-        else if (currentMode == EditMode.SpawnPoint)
-        {
-            if (enemySpawnCells.Contains(c)) enemySpawnCells.Remove(c); else enemySpawnCells.Add(c);
+            else placedTiles.Add(new PlacedTile
+            {
+                position = c,
+                tileIndex = selectedTileIndex,
+                tilemapType = selectedTilemapType,
+                rotation = currentRotation,
+                flipX = flipX,
+                flipY = flipY
+            });
         }
         else if (currentMode == EditMode.PatrolPoint)
         {
             if (patrolCells.Contains(c)) patrolCells.Remove(c); else patrolCells.Add(c);
+        }
+        else if (currentMode == EditMode.PlayerSpawn) // ✅ Set or clear player spawn
+        {
+            if (playerSpawnCell == c) playerSpawnCell = null;
+            else playerSpawnCell = c;
         }
     }
 
@@ -264,9 +338,11 @@ public class TilemapLevelEditor : EditorWindow
             height = gridHeight,
             tiles = placedTiles,
             prefabs = placedPrefabs,
-            enemySpawns = enemySpawnCells,
-            patrolPoints = patrolCells
+            patrolPoints = patrolCells,
+            selectedBackgroundIndex = selectedBackgroundIndex,
+            playerSpawn = playerSpawnCell.HasValue ? playerSpawnCell.Value : new Vector2Int(-1, -1) // ✅
         };
+
         File.WriteAllText(Application.dataPath + $"/Level{currentLevel}.json", JsonUtility.ToJson(d, true));
         AssetDatabase.Refresh();
         Debug.Log("Saved!");
@@ -276,26 +352,57 @@ public class TilemapLevelEditor : EditorWindow
     {
         string p = Application.dataPath + $"/Level{currentLevel}.json";
         if (!File.Exists(p)) { Debug.LogWarning("Not found"); return; }
+
         var d = JsonUtility.FromJson<LevelTileData>(File.ReadAllText(p));
-        gridWidth = d.width; gridHeight = d.height;
-        placedTiles = d.tiles; placedPrefabs = d.prefabs;
-        enemySpawnCells = d.enemySpawns; patrolCells = d.patrolPoints;
+        gridWidth = d.width;
+        gridHeight = d.height;
+        placedTiles = d.tiles;
+        placedPrefabs = d.prefabs;
+        patrolCells = d.patrolPoints;
+        selectedBackgroundIndex = d.selectedBackgroundIndex;
+        playerSpawnCell = (d.playerSpawn.x >= 0 && d.playerSpawn.y >= 0) ? (Vector2Int?)d.playerSpawn : null; // ✅
         Debug.Log("Loaded!");
     }
 
     private void HandleEvents()
     {
         var e = Event.current;
-        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.R)
+
+        if (e.type == EventType.KeyDown)
         {
-            currentRotation = (currentRotation + 90) % 360;
-            Repaint();
+            if (e.keyCode == KeyCode.R)
+            {
+                currentRotation = (currentRotation + 90) % 360;
+                Repaint();
+            }
+            else if (e.keyCode == KeyCode.H)
+            {
+                flipX = !flipX;
+                Repaint();
+            }
+            else if (e.keyCode == KeyCode.V)
+            {
+                flipY = !flipY;
+                Repaint();
+            }
         }
+
         if (e.type == EventType.MouseDown && e.button == 0) isDragging = true;
         if (e.type == EventType.MouseUp && e.button == 0) isDragging = false;
     }
 }
 
-[System.Serializable] public class PlacedTile { public Vector2Int position; public int tileIndex; public TilemapType tilemapType; public int rotation; }
+[System.Serializable] public class PlacedTile { public Vector2Int position; public int tileIndex; public TilemapType tilemapType; public int rotation; public bool flipX; public bool flipY; }
 [System.Serializable] public class PlacedPrefab { public Vector2Int position; public int prefabIndex; public Vector2Int size; }
-[System.Serializable] public class LevelTileData { public int width, height; public List<PlacedTile> tiles; public List<PlacedPrefab> prefabs; public List<Vector2Int> enemySpawns; public List<Vector2Int> patrolPoints; }
+
+[System.Serializable]
+public class LevelTileData
+{
+    public int width, height;
+    public List<PlacedTile> tiles;
+    public List<PlacedPrefab> prefabs;
+    public List<Vector2Int> patrolPoints;
+    public int selectedBackgroundIndex = -1;
+
+    public Vector2Int playerSpawn = new Vector2Int(-1, -1); // ✅ Add this
+}

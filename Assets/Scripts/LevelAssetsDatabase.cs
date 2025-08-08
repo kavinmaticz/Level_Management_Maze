@@ -6,7 +6,10 @@ public class LevelAssetsDatabase : ScriptableObject
 {
     public TileBase[] tiles;           // list of tiles to paint
     public GameObject[] prefabs;       // list of placeable prefabs
-    public GameObject enemyPrefab;     // single enemy prefab
+
+
+    [Header("Background Sprites")]
+    public Sprite[] backgroundSprites;
 
     [System.Serializable]
     public class TilemapBinding
