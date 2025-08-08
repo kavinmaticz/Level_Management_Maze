@@ -4,7 +4,7 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(fileName = "LevelAssetsDatabase", menuName = "Custom/Level Assets Database")]
 public class LevelAssetsDatabase : ScriptableObject
 {
-    public TileBase[] tiles;           // list of tiles to paint
+    public Tile[] tiles;           // list of tiles to paint
     public GameObject[] prefabs;       // list of placeable prefabs
 
 

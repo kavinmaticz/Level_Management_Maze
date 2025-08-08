@@ -1,0 +1,167 @@
+{
+    "width": 50,
+    "height": 25,
+    "tiles": [
+        {
+            "position": {
+                "x": 0,
+                "y": 24
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 1,
+                "y": 24
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 2,
+                "y": 24
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 1,
+                "y": 23
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 0,
+                "y": 23
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 2,
+                "y": 23
+            },
+            "tileIndex": 0,
+            "tilemapType": 1,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 3,
+                "y": 24
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 4,
+                "y": 24
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 5,
+                "y": 24
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 5,
+                "y": 24
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 5,
+                "y": 23
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 4,
+                "y": 23
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 2,
+                "y": 23
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        },
+        {
+            "position": {
+                "x": 3,
+                "y": 23
+            },
+            "tileIndex": 3,
+            "tilemapType": 0,
+            "rotation": 0,
+            "flipX": false,
+            "flipY": false
+        }
+    ],
+    "prefabs": [],
+    "patrolPoints": [],
+    "selectedBackgroundIndex": -1,
+    "playerSpawn": {
+        "x": -1,
+        "y": -1
+    }
+}

@@ -9,7 +9,7 @@ using System;
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
-    public static int levelToLoad = 2;
+    public int levelToLoad = 2;
     public LevelAssetsDatabase assetsDatabase;
 
     [Serializable]
@@ -35,7 +35,7 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        levelToLoad = 2;
+       
         LoadLevelData();
         SpawnTiles();
         SpawnBackgrounds();
