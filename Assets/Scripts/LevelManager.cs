@@ -36,6 +36,11 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
        
+        
+    }
+
+    public void StartData()
+    {
         LoadLevelData();
         SpawnTiles();
         SpawnBackgrounds();

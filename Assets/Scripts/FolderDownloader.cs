@@ -90,6 +90,8 @@ public class FolderDownloader : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
 #endif
+
+        SpriteAssigner.Instance.AssignData();
     }
 
     void ClearFolder(string path)

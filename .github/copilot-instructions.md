@@ -2,7 +2,7 @@
 - Project name: Level_Management_Maze
 - Unity version: Unity 6000.0.34f1
 - Active game object:
-  - Name: 1
+  - Name: Canvas
   - Tag: Untagged
-  - Layer: Default
+  - Layer: UI
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
